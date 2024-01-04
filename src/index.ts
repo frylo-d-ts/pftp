@@ -21,8 +21,9 @@ async function deploy(configuration: Configuration) {
 
 	const configCheckResult = ConfigurationSchema.safeParse(configuration);
 
+	const excludeRegExp = configuration.excludeRegExp || [];
 	const localDirs = configuration?.localFolder
-		? listNestedDirs(configuration?.localFolder)
+		? listNestedDirs(configuration?.localFolder, excludeRegExp)
 		: [];
 	const progress = configuration?.progress ?? "bar";
 	const logger = createLogger(progress === "bar", localDirs.length);
@@ -60,11 +61,24 @@ async function deploy(configuration: Configuration) {
 	const enableSsl: boolean = customLftpOptions.enableSsl;
 
 	const lftp: string = customLftpOptions.lftpCommand;
+	const logLftpCommand: boolean = customLftpOptions.logLftpCommand;
+
+	const toArgValue = (str: string) => JSON.stringify(JSON.stringify(str)).replace(/(^"|"$)/g, '');
+
+	const excludeRegExpString: string = excludeRegExp
+		.map((pattern) => {
+			const patternEgrep = pattern
+				.toString()
+				.replace(/^\//, "")
+				.replace(/\/\w?$/, "");
+			return `--exclude ${toArgValue(patternEgrep)}`;
+		})
+		.join(" ");
 
 	const commands = {
 		open: `open ${openOptions} -u ${username},${password} -p ${port} ${protocol}://${host}`,
 		noSsl: enableSsl ? "" : `set ssl:verify-certificate no`,
-		mirror: `mirror ${mirrorOptions} ${localFolder} ${remoteFolder}`,
+		mirror: `mirror ${mirrorOptions} ${excludeRegExpString} ${localFolder} ${remoteFolder}`,
 	};
 
 	try {
@@ -100,6 +114,11 @@ async function deploy(configuration: Configuration) {
 
 	lftpProcess.stdout.on("data", (data) => {
 		if (deployedCount === 1) {
+			if (logLftpCommand) {
+				logger.printMessage("");
+				logger.printMessage(`${c.blue`⚡`}${lftpCommand}`);
+			}
+
 			logger.printMessage("");
 			logger.printMessage(
 				`${c.blue`⚡`}${c.bold`Uploading`}...  ${c.grey`${localFolder} :: ${remoteFolder}`}`
@@ -124,9 +143,9 @@ async function deploy(configuration: Configuration) {
 					`Invalid format of message from server "${message}". Expected "Finished \`path/to/folder'"`
 				);
 
-			deployedCount++;
-
 			logger.printStep(deployedCount, folderRelativePath);
+
+			deployedCount++;
 		}
 	});
 

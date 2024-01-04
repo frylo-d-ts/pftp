@@ -20,14 +20,15 @@ This package using [LFTP](https://lftp.yar.ru/) to deploy your code to FTP/SFTP/
 
 🔗 **Reference**
 
-  - [🎁 Examples](#🎁-examples)
-    - [👁️ Progressbar CLI example](#👁️-progressbar-cli-example)
-    - [👁️ Progress logs CLI example](#👁️-progress-logs-cli-example)
-  - [🏁 Getting Started](#🏁-getting-started)
-  - [🔑 Configuration](#🔑-configuration)
-  - [⚙️ Package development](#⚙️-package-development)
+- [🎁 Examples](#-examples)
+  - [👁️ Progressbar CLI example](#%EF%B8%8F-progressbar-cli-example)
+  - [👁️ Progress logs CLI example](#%EF%B8%8F-progress-logs-cli-example)
+- [🏁 Getting Started](#-getting-started)
+- [🔑 Configuration](#-configuration)
+- [⚙️ Package development](#%EF%B8%8F-package-development)
 
 ## 🎁 Examples
+
 ### 👁️ Progressbar CLI example
 
 <details><summary>Code of example</summary>
@@ -56,6 +57,7 @@ main()
 	.then(() => process.exit())
 	.catch((error) => console.error(error));
 ```
+
 </details>
 
 ![Progressbar PFTP](./readme/progressbar.png)
@@ -88,6 +90,7 @@ main()
 	.then(() => process.exit())
 	.catch((error) => console.error(error));
 ```
+
 </details>
 
 ![Progress logs PFTP](./readme/progress-logs.png)
@@ -138,28 +141,30 @@ node ./deployment.mjs
 
 **Configuration** schema:
 
-| Option            | Value             | Description                                                                                                                                 |
-| ----------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| host              | string            | IP or URL of your host.                                                                                                                     |
-| port              | number            | Number of port, usually 21 for FTP and 22 for SFTP.                                                                                         |
-| protocol          | 'ftp', 'sftp'     | Protocol for upload. If you are using SSH server, you could simply use SFTP with 22 port.                                                   |
-| username          | string            | Username for connection.                                                                                                                    |
-| password          | string            | Password for connection.                                                                                                                    |
-| localFolder       | string            | Path to source folder on local machine.                                                                                                     |
-| remoteFolder      | string            | Path to target folder on remote machine.                                                                                                    |
-| progress          | 'bar', 'logs'     | Customize process loggin.<br />* Bar - show progress bar (useful for manual execution);<br />* Logs - print logs (useful for GitLab CI/CD). |
-| customLftpOptions | CustomLftpOptions | Allows to advancely configure LFTP. Usually you don't need this option. Read more about this options in CustomLftpOptions schema section.   |
+| Option            | Value             | Description                                                                                                                                                                                                                                                                                                                                                                                            |
+| ----------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| host              | string            | IP or URL of your host.                                                                                                                                                                                                                                                                                                                                                                                |
+| port              | number            | Number of port, usually 21 for FTP and 22 for SFTP.                                                                                                                                                                                                                                                                                                                                                    |
+| protocol          | 'ftp', 'sftp'     | Protocol for upload. If you are using SSH server, you could simply use SFTP with 22 port.                                                                                                                                                                                                                                                                                                              |
+| username          | string            | Username for connection.                                                                                                                                                                                                                                                                                                                                                                               |
+| password          | string            | Password for connection.                                                                                                                                                                                                                                                                                                                                                                               |
+| localFolder       | string            | Path to source folder on local machine.                                                                                                                                                                                                                                                                                                                                                                |
+| remoteFolder      | string            | Path to target folder on remote machine.                                                                                                                                                                                                                                                                                                                                                               |
+| excludeRegExp     | RegExp[]          | List of RegExp's to be excluded. Given RegExp's are applied to file and dir names which are in realtive form (relative to cwd). All RegExp's have to be in[Egrep](https://www.gnu.org/software/findutils/manual/html_node/find_html/posix_002degrep-regular-expression-syntax.html) format, so **flags are not allowed** and there are some **small difference between JS RegExp and Egrep**. |
+| progress          | 'bar', 'logs'     | Customize process loggin.<br />* Bar - show progress bar (useful for manual execution);<br />* Logs - print logs (useful for GitLab CI/CD).                                                                                                                                                                                                                                                            |
+| customLftpOptions | CustomLftpOptions | Allows to advancely configure LFTP. Usually you don't need this option. Read more about this options in CustomLftpOptions schema section.                                                                                                                                                                                                                                                              |
 
 **CustomLftpOptions** schema:
 
-| Option               | Value  | Description                                                                                                                                   |
-| -------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| lftpCommand          | string | Path to LFTP executable or name of lftp command. Defaults to "lftp".                                                                          |
-| beforeOpen           | string | In this string you can pass command to lftp that will be ran before "open" command (before connection).                                       |
-| openCommandOptions   | string | Here you can rewrite CLI options for[open LFTP command](https://lftp.yar.ru/lftp-man.html).                                                      |
-| beforeMirror         | string | In this string you can pass command to LFTP that will be ran before "mirror" command (then you connected, but mirroring haven't started yet). |
-| mirrorCommandOptions | string | Here you can rewrire CLI options for mirror LFTP command.                                                                                     |
-| enaleSsl             | string | By default SSL option for LFTP is disabled, because usually it bring pain for beginners. You could enable it back with this option.           |
+| Option               | Value   | Description                                                                                                                                   |
+| -------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| lftpCommand          | string  | Path to LFTP executable or name of lftp command. Defaults to "lftp".                                                                          |
+| logLftpCommand       | boolean | If true script will log generated LFTP command to console.                                                                                    |
+| beforeOpen           | string  | In this string you can pass command to lftp that will be ran before "open" command (before connection).                                       |
+| openCommandOptions   | string  | Here you can rewrite CLI options for[open LFTP command](https://lftp.yar.ru/lftp-man.html).                                                      |
+| beforeMirror         | string  | In this string you can pass command to LFTP that will be ran before "mirror" command (then you connected, but mirroring haven't started yet). |
+| mirrorCommandOptions | string  | Here you can rewrire CLI options for mirror LFTP command.                                                                                     |
+| enaleSsl             | string  | By default SSL option for LFTP is disabled, because usually it bring pain for beginners. You could enable it back with this option.           |
 
 ## ⚙️ Package development
 
