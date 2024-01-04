@@ -1,5 +1,5 @@
 {
-  "name": "pftp",
+  "name": "@frylo/pftp",
   "version": "1.0.0",
   "description": "Progressive FTP deployment",
   "main": "lib/index.js",

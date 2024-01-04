@@ -1,4 +1,4 @@
-# PFTP - Progressive FTP
+# @frylo/pftp - Progressive FTP
 
 This package using [LFTP](https://lftp.yar.ru/) to deploy your code to FTP/SFTP/SSH server.
 

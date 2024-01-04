@@ -1,4 +1,4 @@
-# pftp - Package Development
+# @frylo/pftp - Package Development
 
 ### Build the package
 
