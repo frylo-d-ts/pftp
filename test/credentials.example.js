@@ -14,4 +14,24 @@ const folders = {
 	remoteFolder: '',
 };
 
-module.exports = { credentials, folders };
+/** @type {Credentials} */
+const credentialsPermissionTest = {
+	host: "",
+	port: 22,
+	protocol: "sftp",
+	username: "",
+	password: "",
+};
+
+const foldersPermissionTest = {
+	localFolder: '',
+	remoteFolder: '',
+};
+
+module.exports = {
+	credentials,
+	folders,
+	credentialsPermissionTest,
+	foldersPermissionTest,
+};
+
