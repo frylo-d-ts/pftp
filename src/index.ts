@@ -24,11 +24,15 @@ async function deploy(configuration: Configuration) {
 	const excludeRegExp = configuration.excludeRegExp || [];
 	const includeForceRegExp = configuration.includeForceRegExp || [];
 
+	const isIncludeForce = includeForceRegExp.length > 0;
+
 	const localDirs = configuration?.localFolder
 		? listNestedDirs(configuration?.localFolder, excludeRegExp)
 		: [];
+
+	const loggerTotal = localDirs.length * (isIncludeForce ? 2 : 1);
 	const progress = configuration?.progress ?? "bar";
-	const logger = createLogger(progress === "bar", localDirs.length);
+	const logger = createLogger(progress === "bar", loggerTotal);
 
 	if (!configCheckResult.success) {
 		logger.printError(
@@ -87,10 +91,9 @@ async function deploy(configuration: Configuration) {
 		open: `open ${openOptions} -u ${username},${password} -p ${port} ${protocol}://${host}`,
 		noSsl: enableSsl ? "" : `set ssl:verify-certificate no`,
 		mirror: `mirror ${mirrorOptions} ${excludeRegExpString} ${localFolder} ${remoteFolder}`,
-		mirrorForce:
-			includeForceRegExp.length > 0
-				? `mirror ${mirrorForceOptions} ${includeForceRegExpString} ${localFolder} ${remoteFolder}`
-				: "",
+		mirrorForce: isIncludeForce
+			? `mirror ${mirrorForceOptions} ${includeForceRegExpString} ${localFolder} ${remoteFolder}`
+			: "",
 	};
 
 	try {
