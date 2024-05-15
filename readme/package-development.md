@@ -10,13 +10,21 @@ npm run build
 
 ### Test the package
 
-You can test the code with [Jest](https://jestjs.io/)
+To test package you have to manually run e2e test scripts, because there is no infra configured to test package automatically.
+
+To run test you have to pass this preconditions:
+
+1. You have a server that could be used to test PFTP
+2. Copy file [credentials example](../test/credentials.example.js) as `test/credentials.js` and add credentials to you server to it. You also have to insert path to deploy folders here.
+
+Then you could run test locally by hand. Before each run of test you are usually need to build this package, so I recommend this command:
 
 ```bash
-npm test
-```
+pnpm build && node ./test/[nameOfText].test.js
 
-You can find the test coverage in `coverage/lcov-report/index.html`.
+# Example with pwd in root of project
+pnpm build && node ./test/deployExcludeRegExp.test.js
+```
 
 ### Check dependencies
 

@@ -21,11 +21,12 @@ This package using [LFTP](https://lftp.yar.ru/) to deploy your code to FTP/SFTP/
 🔗 **Reference**
 
 - [🎁 Examples](#-examples)
-  - [👁️ Progressbar CLI example](#%EF%B8%8F-progressbar-cli-example)
-  - [👁️ Progress logs CLI example](#%EF%B8%8F-progress-logs-cli-example)
+  - [👁️ Progressbar CLI example](#️-progressbar-cli-example)
+  - [👁️ Progress logs CLI example](#️-progress-logs-cli-example)
 - [🏁 Getting Started](#-getting-started)
 - [🔑 Configuration](#-configuration)
-- [⚙️ Package development](#%EF%B8%8F-package-development)
+- [⚙️ Package development](#️-package-development)
+- [📜 LFTP docs](#-lftp-docs)
 
 ## 🎁 Examples
 
@@ -60,7 +61,7 @@ main()
 
 </details>
 
-![Progressbar PFTP](./readme/progressbar.png)
+![Progressbar PFTP](./readme/progress-bar.png)
 
 ### 👁️ Progress logs CLI example
 
@@ -172,3 +173,7 @@ node ./deployment.mjs
 ## ⚙️ Package development
 
 Read more about package development [here](./readme/package-development.md).
+
+## 📜 LFTP docs
+
+[Read here](readme/lftp-mirror-docs.md).
