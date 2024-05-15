@@ -9,8 +9,14 @@ async function main() {
 		progress: 'logs',
 		excludeRegExp: [
 			/^_/,
-			/^images/,
-			/^svg/,
+			/^images\//,
+			/^svg\//,
+			/^cases\//,
+			/^services\//,
+			/^fonts\//,
+			/"/,
+			/\"/,
+			/^\.git/,
 		],
 
 		customLftpOptions: {

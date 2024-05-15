@@ -24,7 +24,7 @@ const credentialsPermissionTest = {
 };
 
 const foldersPermissionTest = {
-	localFolder: '',
+	localFolder: folders.localFolder,
 	remoteFolder: '',
 };
 

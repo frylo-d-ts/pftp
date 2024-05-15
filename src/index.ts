@@ -72,13 +72,13 @@ async function deploy(configuration: Configuration) {
 	const lftp: string = customLftpOptions.lftpCommand;
 	const logLftpCommand: boolean = customLftpOptions.logLftpCommand;
 
-	const toArgValue = (str: string) =>
-		JSON.stringify(JSON.stringify(str)).replace(/(^"|"$)/g, "");
+	const toArgValue = (str: string) => `'${str}'`;
 	const toEgrep = (pattern: RegExp) =>
 		pattern
 			.toString()
 			.replace(/^\//, "")
-			.replace(/\/\w?$/, "");
+			.replace(/\/\w?$/, "")
+			.replace(/(?<!\\)"/g, '\\"');
 
 	const excludeRegExpString: string = excludeRegExp
 		.map((pattern) => `--exclude ${toArgValue(toEgrep(pattern))}`)

@@ -26,6 +26,7 @@ This package using [LFTP](https://lftp.yar.ru/) to deploy your code to FTP/SFTP/
 - [🏁 Getting Started](#-getting-started)
 - [🔑 Configuration](#-configuration)
 - [⚙️ Package development](#️-package-development)
+- [📜 LFTP docs](#-lftp-docs)
 
 ## 🎁 Examples
 
@@ -172,3 +173,7 @@ node ./deployment.mjs
 ## ⚙️ Package development
 
 Read more about package development [here](./readme/package-development.md).
+
+## 📜 LFTP docs
+
+[Read here](readme/lftp-mirror-docs.md).

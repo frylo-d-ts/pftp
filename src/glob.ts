@@ -10,13 +10,14 @@ export function listNestedDirs(
 	});
 
 	const excludeRegExpEgrep = excludeRegExp.map(
-		(regExp) => new RegExp(regExp.source)
+		(regExp) => new RegExp(regExp.source.replace(/\\\/$/, "(\\/|$)"))
 	);
 
 	const result = fullList.filter((folderName) => {
 		const isExcluded = excludeRegExpEgrep.some((regExp) =>
 			regExp.test(folderName)
 		);
+
 		return !isExcluded;
 	});
 
