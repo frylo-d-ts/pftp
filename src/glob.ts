@@ -23,3 +23,24 @@ export function listNestedDirs(
 
 	return result.filter((path) => path !== ".");
 }
+
+export function listNestedEntries(
+	absPathToRootFolder: string,
+	includeOnlyRegExp: RegExp[]
+) {
+	const fullList = globSync("**", {
+		cwd: absPathToRootFolder,
+		realpath: true,
+		nodir: true,
+	});
+
+	const result = fullList.filter((folderName) => {
+		const isIncluded = includeOnlyRegExp.some((regExp) =>
+			regExp.test(folderName)
+		);
+
+		return isIncluded;
+	});
+
+	return result.filter((path) => path !== ".");
+}

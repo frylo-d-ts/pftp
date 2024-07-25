@@ -30,13 +30,8 @@ export const CustomLftpOptionsSchema = z.object({
 			"--reverse --delete --only-newer --verbose=2 --ignore-time --parallel=10"
 		),
 
-	beforeMirrorForce: z.string().optional().default(""),
-	mirrorForceCommandOptions: z
-		.string()
-		.optional()
-		.default(
-			"--reverse --verbose=2 --parallel=10"
-		),
+	beforeMput: z.string().optional().default(""),
+	mputCommandOptions: z.string().optional().default("-d"),
 
 	enableSsl: z.boolean().optional().default(false),
 });
@@ -49,14 +44,8 @@ export const ConfigurationSchema = z
 
 		customLftpOptions: CustomLftpOptionsSchema.optional(),
 
-		excludeRegExp: z
-			.array(z.instanceof(RegExp))
-			.optional()
-			.default([]),
-		includeForceRegExp: z
-			.array(z.instanceof(RegExp))
-			.optional()
-			.default([]),
+		excludeRegExp: z.array(z.instanceof(RegExp)).optional().default([]),
+		includeForceRegExp: z.array(z.instanceof(RegExp)).optional().default([]),
 
 		progress: z.enum(["bar", "logs"]),
 	})
@@ -64,6 +53,6 @@ export const ConfigurationSchema = z
 export type Configuration = z.infer<typeof ConfigurationSchema> & {
 	/** Files to be excluded from upload. Array of RegExp's in [Egrep](https://www.gnu.org/software/findutils/manual/html_node/find_html/posix_002degrep-regular-expression-syntax.html) format. */
 	excludeRegExp: z.infer<typeof ConfigurationSchema>["excludeRegExp"];
-	/** Files to be uploaded no matter does them has changes. Array of RegExp's in [Egrep](https://www.gnu.org/software/findutils/manual/html_node/find_html/posix_002degrep-regular-expression-syntax.html) format. */
+	/** Files to be uploaded no matter does them has changes. **This option cannot handle dirs**. Array of RegExp's in [Egrep](https://www.gnu.org/software/findutils/manual/html_node/find_html/posix_002degrep-regular-expression-syntax.html) format. */
 	includeForceRegExp: z.infer<typeof ConfigurationSchema>["includeForceRegExp"];
 };

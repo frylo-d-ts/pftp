@@ -2,6 +2,14 @@
 
 cutout from here: https://lftp.yar.ru/lftp-man.html
 
+Table of content:
+- [`mirror` command](#mirror-command)
+- [`mput` command](#mput-command)
+- [`put` command](#put-command)
+
+
+## `mirror` command
+
 `mirror [OPTS] [source [target]]`
 
 > Mirror specified source directory to the target directory.
@@ -130,3 +138,35 @@ cutout from here: https://lftp.yar.ru/lftp-man.html
 >
 > The  recursion  modes  \`newer'  and  \`missing' conflict with --scan-all-first, --depth-first,
 > --no-empty-dirs and setting mirror:no-empty-dirs=true.
+
+
+## `mput` command
+
+`mput [-c] [-d] [-a] [-E] [-e] [-P N] [-O base] files`
+
+> Upload files with wildcard expansion. By default it uses the  base  name  of  local  name  as
+> remote one. This can be changed by `-d' option.
+>
+>        -c          continue, reput
+>        -d          create  directories  the same as in file names and put the files into them
+>                    instead of current directory
+>        -E          delete source files after successful transfer (dangerous)
+>        -e          delete target file before the transfer
+>        -a          use ascii mode (binary is the default)
+>        -P N        upload N files in parallel
+>        -O <base>   specifies base directory or URL where files should be placed
+
+
+## `put` command
+
+`put [-E] [-a] [-c] [-e] [-P N] [-O base] lfile [-o rfile]`
+
+> Upload lfile with remote name rfile. If -o omitted, the base name of lfile is used as  remote
+> name. Does not expand wildcards, use mput for that.
+>
+>        -o <rfile>   specifies remote file name (default - basename of lfile)
+>        -c           continue, reput. It requires permission to overwrite remote files
+>        -E           delete source files after successful transfer (dangerous)
+>        -e           delete target file before the transfer
+>        -a           use ascii mode (binary is the default)
+>        -P N         upload N files in parallel
