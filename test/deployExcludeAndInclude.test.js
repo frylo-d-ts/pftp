@@ -10,12 +10,21 @@ async function main() {
 		progress: 'bar',
 
 		excludeRegExp: [
-			/./ // Exclude everything making mirror disabled
+			/^static\//,
+			/^_\//,
+			/^_next\//,
+			/^images\//,
+			/^svg\//,
+			/^fonts\//,
 		],
 
 		includeForceRegExp: [
 			/index\.html$/,
 		],
+
+		customLftpOptions: {
+			logLftpCommand: true,
+		},
 	});
 }
 

@@ -4,7 +4,7 @@ import c from "chalk";
 import commandExists from "command-exists";
 import humanizeDuration from "humanize-duration";
 
-import { listNestedDirs } from "./glob";
+import { listNestedDirs, listNestedEntries } from "./glob";
 import { createLogger } from "./logger";
 
 import {
@@ -29,8 +29,11 @@ async function deploy(configuration: Configuration) {
 	const localDirs = configuration?.localFolder
 		? listNestedDirs(configuration?.localFolder, excludeRegExp)
 		: [];
+	const localForceFiles = configuration?.localFolder
+		? listNestedEntries(configuration?.localFolder, includeForceRegExp)
+		: [];
 
-	const loggerTotal = localDirs.length * (isIncludeForce ? 2 : 1);
+	const loggerTotal = localDirs.length + localForceFiles.length;
 	const progress = configuration?.progress ?? "bar";
 	const logger = createLogger(progress === "bar", loggerTotal);
 
@@ -60,12 +63,11 @@ async function deploy(configuration: Configuration) {
 
 	const beforeOpen: string = customLftpOptions.beforeOpen;
 	const beforeMirror: string = customLftpOptions.beforeMirror;
-	const beforeMirrorForce: string = customLftpOptions.beforeMirror;
+	const beforeMput: string = customLftpOptions.beforeMput;
 
 	const openOptions: string = customLftpOptions.openCommandOptions;
 	const mirrorOptions: string = customLftpOptions.mirrorCommandOptions;
-	const mirrorForceOptions: string =
-		customLftpOptions.mirrorForceCommandOptions;
+	const mputOptions: string = customLftpOptions.mputCommandOptions;
 
 	const enableSsl: boolean = customLftpOptions.enableSsl;
 
@@ -83,16 +85,19 @@ async function deploy(configuration: Configuration) {
 	const excludeRegExpString: string = excludeRegExp
 		.map((pattern) => `--exclude ${toArgValue(toEgrep(pattern))}`)
 		.join(" ");
-	const includeForceRegExpString: string = includeForceRegExp
-		.map((pattern) => `--include ${toArgValue(toEgrep(pattern))}`)
-		.join(" ");
+	const mputCommands: string = localForceFiles
+		.map((filepath) => {
+			const file = filepath.replace(/([[\](){}])/g, "\\$1");
+			return `mput ${mputOptions} '${file}'; echo '@frylo mput success \\\`${file}\\''`;
+		})
+		.join("; ");
 
 	const commands = {
 		open: `open ${openOptions} -u ${username},${password} -p ${port} ${protocol}://${host}`,
 		noSsl: enableSsl ? "" : `set ssl:verify-certificate no`,
 		mirror: `mirror ${mirrorOptions} ${excludeRegExpString} ${localFolder} ${remoteFolder}`,
-		mirrorForce: isIncludeForce
-			? `mirror ${mirrorForceOptions} ${includeForceRegExpString} ${localFolder} ${remoteFolder}`
+		mput: isIncludeForce
+			? `lcd ${configuration?.localFolder}; cd ${configuration?.remoteFolder}; ${mputCommands}`
 			: "",
 	};
 
@@ -114,13 +119,20 @@ async function deploy(configuration: Configuration) {
 	logger.printMessage("");
 	logger.printMessage(`${c.blue`⬖`} ${c.bold`Connecting`} to server...`);
 
-	const lftpCommand =
-		`lftp -c "` +
-		(`${beforeOpen}; ${commands.open}; ` +
-			`${commands.noSsl}; ` +
-			`${beforeMirror}; ${commands.mirror}; ` +
-			`${beforeMirrorForce}; ${commands.mirrorForce}`) +
-		`"`;
+	const lfptExecutable = [
+		beforeOpen,
+		commands.open,
+		commands.noSsl,
+
+		beforeMirror,
+		commands.mirror,
+
+		beforeMput,
+		commands.mput,
+	]
+		.filter((command) => command)
+		.join("; ");
+	const lftpCommand = `lftp -c "${lfptExecutable}"`;
 	const lftpProcess = spawn(lftpCommand, [], { shell: true });
 
 	let deployedCount = 1;
@@ -135,13 +147,13 @@ async function deploy(configuration: Configuration) {
 
 	const errorLog: string[] = [];
 
+	if (logLftpCommand) {
+		logger.printMessage("");
+		logger.printMessage(`${c.blue`⚡`}${lftpCommand}`);
+	}
+
 	lftpProcess.stdout.on("data", (data) => {
 		if (deployedCount === 1) {
-			if (logLftpCommand) {
-				logger.printMessage("");
-				logger.printMessage(`${c.blue`⚡`}${lftpCommand}`);
-			}
-
 			logger.printMessage("");
 			logger.printMessage(
 				`${c.blue`⚡`}${c.bold`Uploading`}...  ${c.grey`${localFolder} :: ${remoteFolder}`}`
@@ -154,23 +166,26 @@ async function deploy(configuration: Configuration) {
 
 		for (const message of messages) {
 			const isFinishedMirror = message.startsWith("Finished mirror");
+			const isCustomMessage = message.startsWith("@frylo ");
 
-			if (!isFinishedMirror) return;
+			if (!isFinishedMirror && !isCustomMessage) return;
 
-			const folderRelativePath = message.match(
-				/^Finished mirror `(.*?)'$/
-			)?.[1];
+			const fileRelPath = message.match(
+				/^(Finished mirror|@frylo (mput success)) `(.*?)'$/
+			)?.[3];
 
-			if (!folderRelativePath) {
+			if (!fileRelPath) {
 				deployPromiseReject(
 					new Error(
-						`Invalid format of message from server "${message}". Expected "Finished \`path/to/folder'"`
+						`Invalid format of message from server "${message}".` +
+							` Expected "Finished \`path/to/folder'"` +
+							` or "@frylo mput success \`path/to/file'"`
 					)
 				);
 				return;
 			}
 
-			logger.printStep(deployedCount, folderRelativePath);
+			logger.printStep(deployedCount, fileRelPath);
 
 			deployedCount++;
 		}
